@@ -15,14 +15,14 @@ module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
     const id = req.body.id
     const user = security.authenticatedUsers.from(req)
-    db.reviewsCollection.findOne({ _id: id }).then((review: Review) => {
+    db.reviewsCollection.findOne({ _id: { $eq: id } }).then((review: Review) => {
       if (!review) {
         res.status(404).json({ error: 'Not found' })
       } else {
         const likedBy = review.likedBy
         if (!likedBy.includes(user.data.email)) {
           db.reviewsCollection.update(
-            { _id: id },
+            { _id: { $eq: id } },
             { $inc: { likesCount: 1 } }
           ).then(
             () => {
